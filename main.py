@@ -1,6 +1,3 @@
-""" from sklearn.svm import SVC
-from nltk.classify.scikitlearn import SklearnClassifier
-from sklearn import model_selection """
 from textblob import TextBlob
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem import PorterStemmer
@@ -23,32 +20,39 @@ text = soup.get_text()
 text2 = text.replace("    ", "")
 # print(text2)
 
-# TODO: mozda obrisar sve sto nije tekst i onda uradit lowercase
-
-# Lower case
+# brisanje sve sto nije letter
 letters_only = re.sub("[^a-zA-Z]", " ", text2)
 letters_only = letters_only.replace("   ", "\n")
 lines = letters_only.splitlines()
 # print(lines)
 
-#print(" " . join(letters_only))
-# print(letters_only.strip())
 
-lower_case = [x.lower() for x in lines]
+# brisanje viska whitespace
+lines2 = []
+
+for sentence in lines:
+    lines2.append(sentence.strip())
+
+# print(lines2)
+
+# brisanje prazan string
+linesFinal = list(filter(None, lines2))
+# print(linesFinal)
+
+# Lower case
+lower_case = [x.lower() for x in linesFinal]
 # print(lower_case)
 
 
 # word tokenization -- TODO: ne treba
-#words =  lower_case[0].split(' ')
+# words =  lower_case[0].split(' ')
 # print(words)
 
-#from nltk.tokenize import word_tokenize
+# from nltk.tokenize import word_tokenize
 
 
 wordToken = []
 sentenceToken = []
-
-# TODO: ima visak red...treba popravit
 
 for a in lower_case:
     # print(a)
@@ -61,7 +65,7 @@ for a in lower_case:
 # print(wordToken)
 
 # TODO: ne treba
-#tokens = [t for t in wordToken]
+# tokens = [t for t in wordToken]
 # print(tokens)
 
 # remove stopwords
@@ -77,8 +81,8 @@ for token in wordToken:
 # frequency
 freq = nltk.FreqDist(clean_tokens)
 # for key,val in freq.items():
-#print(str(key) + ':' + str(val))
-#freq.plot(20, cumulative=False)
+# print(str(key) + ':' + str(val))
+# freq.plot(20, cumulative=False)
 
 # stemming word
 
@@ -93,7 +97,7 @@ print("\n")
 lem = WordNetLemmatizer()
 
 # for word in clean_tokens:
-#print ("{0:20}{1:20}".format(word,lem.lemmatize(word)))
+# print ("{0:20}{1:20}".format(word,lem.lemmatize(word)))
 
 # print(sentenceToken)
 array_length = len(sentenceToken)
@@ -104,12 +108,23 @@ for i in range(array_length):
 
     i = i+1
 
-# TODO: treba obrisat whitespace
-
 # print(obj)
 
 # detect sentences' language
-# print(obj[0].detect_language())
+foreignFeedback = []
+for x in obj:
+    #print(x + ' is written in: ' + x.detect_language())
+    if x.detect_language() != "en":
+        foreignFeedback.append(x)
+
+if not foreignFeedback:
+    print("There are no feedback written in foreign language (not english)")
+else:
+    print(foreignFeedback)
+
+# translate to english - TODO: ovo treba uradit
+
+# spelling coorection - TODO: ovo uradit
 
 sentiment = []
 
@@ -127,8 +142,8 @@ def merge(obj, sentiment):
 
 
 combine = merge(sentenceToken, sentiment)
-print(combine)
+# print(combine)
 
 output = pd.DataFrame(data={"text": sentenceToken, "sentiment": sentiment})
 
-#output.to_csv("CSVFormat.csv", index=False, quoting=3 )
+# output.to_csv("CSVFormat.csv", index=False, quoting=3 )
