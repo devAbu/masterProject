@@ -1,4 +1,4 @@
-from textblob import TextBlob
+from textblob import TextBlob, Word
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem import PorterStemmer
 import nltk
@@ -117,21 +117,24 @@ for x in obj:
     if x.detect_language() != "en":
         foreignFeedback.append(x)
 
-if not foreignFeedback:
+""" if not foreignFeedback:
     print("There are no feedback written in foreign language (not english)")
 else:
-    print(foreignFeedback)
+    print(foreignFeedback) """
 
 # translate to english - TODO: ovo treba uradit
 
-# spelling coorection - TODO: ovo uradit
+# spelling coorection - TODO: treba skontat koja ne valja i samo to da popravi
+for x in obj:
+    print(x)
+    print(x.correct())
 
 sentiment = []
 
 for a in obj:
     sentiment.append((a.sentiment.polarity) * 100)
 
-# TODO: treba bolji da bude (mogu stavit samo bolje recenice :P)
+# TODO: treba bolji da bude (mogu stavit samo bolje recenice :P) - fula na I don't recommend anyone to take this car i Remove this car from the page
 
 # print(sentiment)
 
