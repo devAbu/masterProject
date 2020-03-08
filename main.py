@@ -64,6 +64,24 @@ for a in lower_case:
 # print(sentenceToken)
 # print(wordToken)
 
+# spelling coorection
+count = 0
+for x in wordToken:
+    # print(x)
+    w = Word(x)
+    # print(w.spellcheck())
+    # mozda uradit da se popravi cijela recenica iz sentenceToken
+    if (w.spellcheck()[0][1] != 1):
+        print("\n Incorrent word '" + w +
+              "' --- Corrent word: '" + w.correct() + "' \n")
+
+        for i in sentenceToken:
+            if (w in sentenceToken[count]):
+                print(TextBlob(sentenceToken[count]).correct())
+            count = count + 1
+        count = 0
+
+
 # TODO: ne treba
 # tokens = [t for t in wordToken]
 # print(tokens)
@@ -124,17 +142,10 @@ else:
 
 # translate to english - TODO: ovo treba uradit
 
-# spelling coorection - TODO: treba skontat koja ne valja i samo to da popravi
-for x in obj:
-    print(x)
-    print(x.correct())
-
 sentiment = []
 
 for a in obj:
     sentiment.append((a.sentiment.polarity) * 100)
-
-# TODO: treba bolji da bude (mogu stavit samo bolje recenice :P) - fula na I don't recommend anyone to take this car i Remove this car from the page
 
 # print(sentiment)
 
@@ -145,7 +156,7 @@ def merge(obj, sentiment):
 
 
 combine = merge(sentenceToken, sentiment)
-# print(combine)
+print(combine)
 
 output = pd.DataFrame(data={"text": sentenceToken, "sentiment": sentiment})
 
