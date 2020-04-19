@@ -18,6 +18,7 @@ html = response.read()
 soup = BeautifulSoup(html, 'html5lib')
 text = soup.get_text()
 text2 = text.replace("    ", "")
+# text2 = text2.split('\n')
 # print(text2)
 
 # brisanje sve sto nije letter
@@ -32,7 +33,6 @@ lines2 = []
 
 for sentence in lines:
     lines2.append(sentence.strip())
-
 # print(lines2)
 
 # brisanje prazan string
@@ -43,10 +43,28 @@ linesFinal = list(filter(None, lines2))
 lower_case = [x.lower() for x in linesFinal]
 # print(lower_case)
 
+"""OVO NIJE POTREBNO
+# convert to tuple
+tuple_all = tuple(lower_case)
+# print(tuple_all)
 
-# word tokenization -- TODO: ne treba
-# words =  lower_case[0].split(' ')
-# print(words)
+# po 2 elementa u tuple
+tuple_two_elements = tuple(tuple_all[x:x + 2]
+                           for x in range(0, len(tuple_all), 2))
+# print(tuple_two_elements)
+
+# feedback bez pos i neg
+feedbacks = [x[0] for x in tuple_two_elements]
+# print(feedbacks)
+
+# pos or neg
+pos_neg = [x[1] for x in tuple_two_elements]
+# print(pos_neg)
+"""
+
+# word tokenization
+""" words = lower_case[0].split(' ')
+print(words) """
 
 # from nltk.tokenize import word_tokenize
 
@@ -55,41 +73,50 @@ wordToken = []
 sentenceToken = []
 
 for a in lower_case:
-    # print(a)
     sentenceToken.append(a)
     for i, word in enumerate(a.split()):
         wordToken.append(word)
-        # print(wordToken)
 
 # print(sentenceToken)
 # print(wordToken)
 
 # spelling coorection
+
 count = 0
 for x in wordToken:
     # print(x)
     w = Word(x)
     # print(w.spellcheck())
-    # mozda uradit da se popravi cijela recenica iz sentenceToken
     if (w.spellcheck()[0][1] != 1):
-        print("\n Incorrent word '" + w +
+        print("\n Incorrect word '" + w +
               "' --- Corrent word: '" + w.correct() + "' \n")
 
-        for i in sentenceToken:
+    """ for i in sentenceToken:
             if (w in sentenceToken[count]):
-                print(TextBlob(sentenceToken[count]).correct())
+                sentenceToken[count] = TextBlob(sentenceToken[count]).correct()
             count = count + 1
-        count = 0
+        count = 0 """
+
+correntWord = []
+for x in wordToken:
+    correntWord.append(TextBlob(x).correct())
+    count = count + 1
+# print(correntWord)
+
+correntSentence = []
+for i in sentenceToken:
+    correntSentence.append(TextBlob(i).correct())
+    count = count + 1
+# print(correntSentence)
 
 
-# TODO: ne treba
-# tokens = [t for t in wordToken]
-# print(tokens)
+# word tokenizer 2
+""" tokens = [t for t in wordToken]
+print(tokens) """
 
-# remove stopwords
 sr = stopwords.words('english')
-clean_tokens = wordToken[:]
-for token in wordToken:
+clean_tokens = correntWord[:]
+for token in correntWord:
     if token in stopwords.words('english'):
 
         clean_tokens.remove(token)
@@ -98,66 +125,40 @@ for token in wordToken:
 
 # frequency
 freq = nltk.FreqDist(clean_tokens)
-# for key,val in freq.items():
-# print(str(key) + ':' + str(val))
-# freq.plot(20, cumulative=False)
+""" for key, val in freq.items():
+    print(str(key) + ':' + str(val))
+freq.plot(20, cumulative=False) """
 
-# stemming word
 
 ps = PorterStemmer()
-# for word in clean_tokens:
-# print("{0:20}{1:20}".format(word,ps.stem(word)))
+""" for word in clean_tokens:
+    print("{0:20}{1:20}".format(word, ps.stem(word))) """
 
 
 print("\n")
-# lemmatization
+
 
 lem = WordNetLemmatizer()
 
 # for word in clean_tokens:
 # print ("{0:20}{1:20}".format(word,lem.lemmatize(word)))
 
-# print(sentenceToken)
-array_length = len(sentenceToken)
-obj = []
-for i in range(array_length):
-    # print(i)
-    obj.append(TextBlob(sentenceToken[i]))
-
-    i = i+1
-
-# print(obj)
-
-# detect sentences' language
-foreignFeedback = []
-for x in obj:
-    #print(x + ' is written in: ' + x.detect_language())
-    if x.detect_language() != "en":
-        foreignFeedback.append(x)
-
-""" if not foreignFeedback:
-    print("There are no feedback written in foreign language (not english)")
-else:
-    print(foreignFeedback) """
-
-# translate to english - TODO: ovo treba uradit
-
 sentiment = []
 
-for a in obj:
+for a in correntSentence:
     sentiment.append((a.sentiment.polarity) * 100)
+print(sentiment)
 
-# print(sentiment)
 
-
-def merge(obj, sentiment):
-    merged_list = [(obj[i], sentiment[i]) for i in range(0, len(obj))]
+def merge(correntSentence, sentiment):
+    merged_list = [(correntSentence[i], sentiment[i])
+                   for i in range(0, len(correntSentence))]
     return merged_list
 
 
-combine = merge(sentenceToken, sentiment)
-print(combine)
+combine = merge(correntSentence, sentiment)
+# print(combine)
 
-output = pd.DataFrame(data={"text": sentenceToken, "sentiment": sentiment})
+output = pd.DataFrame(data={"text": correntSentence, "sentiment": sentiment})
 
-# output.to_csv("CSVFormat.csv", index=False, quoting=3 )
+output.to_csv("CSVFormat.csv", index=False, quoting=3)
